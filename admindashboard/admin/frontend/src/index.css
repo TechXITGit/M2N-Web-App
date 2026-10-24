@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+@theme {
+  --color-porcelain: #F7F5F2;
+  --color-ink: #0E0E0E;
+  --color-terracotta: #C56B4A;
+  --color-sage: #5D6E5B;
+  --color-line: #E0DCD5;
+  --color-muted: #8A8580;
+  --color-cream: #EDE9E3;
+  --color-warm: #B5B0A9;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============ BASE ============ */
+@layer base {
+  html, body {
+    overflow-x: clip;
+    background: var(--color-porcelain);
+  }
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scrollbar-width: none;
+  }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  *, ::before, ::after { border-color: var(--color-line); }
+  ::selection { background: var(--color-terracotta); color: var(--color-porcelain); }
+  img { user-select: none; -webkit-user-drag: none; }
+  @media (pointer: fine) {
+    a, button, [role="button"], label, select { cursor: pointer !important; }
+  }
+}
+
+/* ============ COMPONENTS ============ */
+@layer components {
+  /* 12-col editorial grid */
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 1.5rem;
+    row-gap: 1.5rem;
+    width: 100%;
+    max-width: 1560px;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4vw, 4.5rem);
+  }
+
+  /* Labels & UI type */
+  .u-label {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .u-label-sm {
+    font-family: var(--font-sans);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  /* Display type */
+  .t-hero {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+  }
+  .t-section {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+  .t-quote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  /* Underline-expand link */
+  .link-line { position: relative; display: inline-flex; align-items: center; gap: 0.55rem; width: fit-content; }
+  .link-line::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -5px;
+    height: 1px; width: 100%;
+    background: var(--color-terracotta);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.55s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  .link-line:hover::after { transform: scaleX(1); }
+
+  /* Outlined button */
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid var(--color-terracotta);
+    color: var(--color-terracotta);
+    padding: 0.85rem 1.9rem;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    background: transparent;
+    transition: background 0.45s ease, color 0.45s ease;
+  }
+  .btn-outline:hover { background: var(--color-terracotta); color: var(--color-porcelain); }
+
+  /* Underline-only form field */
+  .field {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 0;
+    padding: 0.95rem 0;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--color-ink);
+    outline: none;
+    box-shadow: none;
+    transition: border-color 0.4s ease;
+  }
+  .field::placeholder { color: var(--color-warm); letter-spacing: 0.02em; }
+  .field:focus { border-bottom-color: var(--color-terracotta); }
+  select.field { appearance: none; -webkit-appearance: none; }
+  input[type="date"].field::-webkit-calendar-picker-indicator { opacity: 0.45; }
+
+  /* Image treatment */
+  .img-frame { overflow: hidden; position: relative; }
+  .img-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: saturate(0.9);
+    transition: filter 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+  .img-frame:hover img { filter: saturate(1.05); transform: scale(1.03); }
+
+  .img-zoom-slow img { transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s ease !important; }
+  .img-zoom-slow:hover img { transform: scale(1.08); }
+
+  /* Custom cursor ring states */
+  .cursor-ring { width: 40px; height: 40px; }
+  .cursor-ring[data-mode="link"] {
+    width: 64px; height: 42px;
+    border-radius: 999px;
+    background: rgba(197, 107, 74, 0.14);
+    border-color: var(--color-terracotta);
+  }
+  .cursor-ring[data-mode="view"] {
+    width: 82px; height: 82px;
+    background: rgba(247, 245, 242, 0.72);
+    backdrop-filter: blur(3px);
+    border-color: var(--color-terracotta);
+  }
+
+  /* Drop cap */
+  .drop-cap::first-letter {
+    font-family: var(--font-display);
+    font-size: 4.6rem;
+    font-weight: 500;
+    line-height: 0.82;
+    float: left;
+    padding-right: 0.85rem;
+    padding-top: 0.45rem;
+    color: var(--color-terracotta);
+  }
+
+  /* Grain overlay */
+  .grain {
+    position: fixed; inset: 0;
+    z-index: 34;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Row with hover shift */
+  .row-shift { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .row-shift:hover { transform: translateX(8px); }
+
+  /* Breathing circles (spa) */
+  .breathe { animation: breathe 6s ease-in-out infinite; }
+  .breathe-rev { animation-direction: reverse; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(0.96); }
+    50% { transform: scale(1.1); }
+  }
+
+  /* Swiper lightbox chrome */
+  .swiper-button-prev, .swiper-button-next {
+    color: var(--color-ink);
+    width: 44px; height: 44px;
+  }
+  .swiper-button-prev::after, .swiper-button-next::after { font-size: 18px; }
+  .swiper-button-disabled { opacity: 0.2; }
+}

@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String    @id @default(uuid())
+  name                 String
+  email                String?   @unique
+  password             String?
+  phone                String?
+  nationality          String?
+  resetPasswordOtp     String?
+  resetPasswordExpires DateTime?
+  twoFactorOtp         String?
+  twoFactorExpires     DateTime?
+  isVerified           Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  bookings             Booking[]
+}
+
+model Admin {
+  id                        String    @id @default(uuid())
+  email                     String    @unique
+  password                  String
+  role                      String    @default("admin") // "admin" or "superadmin"
+  name                      String
+  phone                     String?
+  twoFactorEnabled          Boolean   @default(false)
+  twoFactorSecret           String?
+  twoFactorVerified         Boolean   @default(false)
+  twoFactorSetupCompletedAt DateTime?
+  twoFactorBackupCodes      String[]
+  permissions               String[]
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+  hotels                    Hotel[]
+}
+
+model Receptionist {
+  id          String   @id @default(uuid())
+  hotelId     String   @unique
+  name        String
+  email       String   @unique
+  password    String
+  role        String   @default("receptionist")
+  phone       String?
+  permissions String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  hotel       Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+}
+
+model Hotel {
+  id           String         @id @default(uuid())
+  name         String
+  city         String
+  state        String
+  type         String
+  tagline      String
+  address      String
+  lat          Float
+  lng          Float
+  description  String
+  images       String[]
+  addedBy      String?
+  isArchived   Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  admin        Admin?         @relation(fields: [addedBy], references: [id], onDelete: SetNull)
+  receptionist Receptionist?
+  categories   RoomCategory[]
+  bookings     Booking[]
+}
+
+model GlobalRoomCategory {
+  id         String   @id @default(uuid())
+  name       String
+  amenities  String[]
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model RoomCategory {
+  id            String    @id @default(uuid())
+  hotelId       String
+  name          String
+  numberOfRooms Int       @default(1)
+  roomSize      String
+  numberOfBeds  Int       @default(1)
+  isAC          Boolean   @default(false)
+  view          String
+  capacity      Int
+  price         Float
+  features      String[]
+  images        String[]
+  galleryImages String[]
+  rooms         Json?     @default("[]")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  hotel         Hotel     @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+}
+
+model Booking {
+  id                    String       @id @default(uuid())
+  bookingId             String       @unique
+  userId                String
+  hotelId               String
+  roomCategoryId        String
+  checkIn               DateTime
+  checkInTime           String
+  checkOut              DateTime
+  checkOutTime          String
+  quantity              Int
+  adults                Int
+  children              Int          @default(0)
+  totalAmount           Float
+  status                String       @default("pending") // pending, confirmed, failed, cancelled
+  razorpayOrderId       String?
+  razorpayPaymentId     String?
+  validIdUrl            String?
+  assignedRoomNumber    String?
+  cancellationRequested Boolean      @default(false)
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hotel                 Hotel        @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  roomCategory          RoomCategory @relation(fields: [roomCategoryId], references: [id], onDelete: Cascade)
+}
